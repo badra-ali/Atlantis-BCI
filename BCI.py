@@ -2,7 +2,7 @@ import streamlit as st
 from streamlit_tags import st_tags  # For tag functionality
 
 # Configuration de la page
-st.set_page_config(page_title="Atlantis BCI -Base de Connaissance Intelligente", layout="wide")
+st.set_page_config(page_title="AtlantisBCI", layout="wide")
 
 # Option de thème
 theme = st.sidebar.selectbox("Choisissez le thème", ["Clair", "Sombre"])
@@ -40,7 +40,7 @@ else:
     )
 
 # Titre de l'application
-st.title("Atlantis BCI -Base de Connaissance Intelligente")
+st.title("AtlantisBCI")
 
 # Barre latérale pour la navigation avec icônes
 section = st.sidebar.radio(
@@ -58,7 +58,7 @@ section = st.sidebar.radio(
 
 # Fonctionnalité d'accueil
 if section == "🏠 Accueil":
-    st.header("Bienvenue sur Atlantis BCI")
+    st.header("Bienvenue sur AtlantisBCI")
     st.write("""
     La Base de Connaissance Intelligente (BCI) est conçue pour améliorer la gestion des connaissances et la productivité.
     Utilisez la barre latérale pour naviguer entre les différentes sections de l'application.
