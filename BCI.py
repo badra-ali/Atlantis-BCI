@@ -87,7 +87,7 @@ def add_bg_video():
         </style>
         <div class="video-container">
             <video autoplay loop muted>
-                <source src="https://www.youtube.com/watch?v=UT5F9AXjwhg">
+                <source src="https://i.vimeocdn.com/video/876160608-d4a0e75ff0a2df239957635725e35d6efdcd83bdc8ad93533be46b5e1270b945-d?mw=1200&mh=675&q=70">
             </video>
         </div>
         """,
