@@ -73,7 +73,6 @@ def add_bg_image():
 
 # Exemple d'utilisation dans la section Accueil
 section = "🏠 Accueil"  # Cette variable peut être modifiée selon votre logique de navigation
-
 if section == "🏠 Accueil":
     add_bg_image()  # Ajout de l'image en arrière-plan
     st.header("Bienvenue sur AtlantisBCI")
@@ -86,6 +85,7 @@ if section == "🏠 Accueil":
 
 # Fonctionnalité de stockage et d'organisation
 elif section == "📂 Stockage et Organisation":
+    add_bg_image()
     st.header("Stockage et Organisation des Connaissances")
     st.write("Téléchargez et organisez vos documents ici.")
     
@@ -102,6 +102,7 @@ elif section == "📂 Stockage et Organisation":
 
 # Fonctionnalité de recherche
 elif section == "🔍 Recherche":
+    add_bg_image()
     st.header("Recherche et Extraction de Connaissances")
     
     # Sélection du type de recherche
@@ -127,6 +128,7 @@ elif section == "🔍 Recherche":
 
 # Fonctionnalité de collaboration
 elif section == "🤝 Collaboration":
+    add_bg_image()
     st.header("Collaboration et Partage")
     st.write("Partagez vos documents et collaborez avec votre équipe ici.")
     
@@ -145,6 +147,7 @@ elif section == "🤝 Collaboration":
 
 # Fonctionnalité de sécurité
 elif section == "🔒 Sécurité":
+    add_bg_image()
     st.header("Sécurité et Confidentialité")
     st.write("Gérez les paramètres de sécurité et les permissions d'accès.")
     
@@ -156,6 +159,7 @@ elif section == "🔒 Sécurité":
 
 # Fonctionnalité d'intégration
 elif section == "🔗 Intégration":
+    add_bg_image()
     st.header("Intégration et Accessibilité")
     st.write("Intégrez Atlantis BCI avec d'autres outils et applications.")
     
@@ -166,6 +170,7 @@ elif section == "🔗 Intégration":
 
 # Fonctionnalité de gestion de profil utilisateur
 elif section == "👤 Profil Utilisateur":
+    add_bg_image()
     st.header("Gestion de Profil Utilisateur")
     
     # Champs du profil utilisateur
