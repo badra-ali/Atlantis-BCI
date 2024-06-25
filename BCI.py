@@ -56,16 +56,32 @@ section = st.sidebar.radio(
     ]
 )
 
+# Fonction pour ajouter une image en arrière-plan
+def add_bg_image():
+    st.markdown(
+        """
+        <style>
+        .stApp {
+            background-image: url('URL_DE_VOTRE_IMAGE');
+            background-size: cover;
+            background-position: center;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
 # Exemple d'utilisation dans la section Accueil
 section = "🏠 Accueil"  # Cette variable peut être modifiée selon votre logique de navigation
 
 if section == "🏠 Accueil":
-    #add_bg_video()  # Ajout de la vidéo en arrière-plan
+    add_bg_image()  # Ajout de l'image en arrière-plan
     st.header("Bienvenue sur AtlantisBCI")
     st.write("""
     La Base de Connaissance Intelligente (BCI) est conçue pour améliorer la gestion des connaissances et la productivité.
     Utilisez la barre latérale pour naviguer entre les différentes sections de l'application.
     """)
+
 
 
 # Fonctionnalité de stockage et d'organisation
