@@ -62,7 +62,7 @@ def add_bg_image():
         """
         <style>
         .stApp {
-            background-image: url('URL_DE_VOTRE_IMAGE');
+            background-image: url('https://www.zonebourse.com/images/ImagesTagged/zbimg_2786802_800.jpg');
             background-size: cover;
             background-position: center;
             }
