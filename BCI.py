@@ -56,13 +56,55 @@ section = st.sidebar.radio(
     ]
 )
 
-# Fonctionnalité d'accueil
+# Fonction pour ajouter une vidéo en arrière-plan
+def add_bg_video():
+    st.markdown(
+        """
+        <style>
+        .stApp {
+            position: relative;
+            background: transparent;
+        }
+        .video-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        .video-container video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+        }
+        </style>
+        <div class="video-container">
+            <video autoplay loop muted>
+                <source src="URL_DE_VOTRE_VIDEO" type="video/mp4">
+            </video>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+# Exemple d'utilisation dans la section Accueil
+section = "🏠 Accueil"  # Cette variable peut être modifiée selon votre logique de navigation
+
 if section == "🏠 Accueil":
+    add_bg_video()  # Ajout de la vidéo en arrière-plan
     st.header("Bienvenue sur AtlantisBCI")
     st.write("""
     La Base de Connaissance Intelligente (BCI) est conçue pour améliorer la gestion des connaissances et la productivité.
     Utilisez la barre latérale pour naviguer entre les différentes sections de l'application.
     """)
+
 
 # Fonctionnalité de stockage et d'organisation
 elif section == "📂 Stockage et Organisation":
