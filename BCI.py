@@ -72,7 +72,7 @@ def add_bg_image():
     )
 
 # Exemple d'utilisation dans la section Accueil
-section = "🏠 Accueil"  # Cette variable peut être modifiée selon votre logique de navigation
+#section = "🏠 Accueil"  # Cette variable peut être modifiée selon votre logique de navigation
 if section == "🏠 Accueil":
     add_bg_image()  # Ajout de l'image en arrière-plan
     st.header("Bienvenue sur AtlantisBCI")
