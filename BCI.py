@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 from streamlit_tags import st_tags  # For tag functionality
 
 # Configuration de la page
@@ -84,6 +85,12 @@ if section == "🏠 Accueil":
 
 
 # Fonctionnalité de stockage et d'organisation
+
+# Initialisation du répertoire de stockage
+storage_directory = "uploaded_files"
+if not os.path.exists(storage_directory):
+    os.makedirs(storage_directory)
+
 elif section == "📂 Stockage et Organisation":
     add_bg_image()
     st.header("Stockage et Organisation des Connaissances")
@@ -93,12 +100,31 @@ elif section == "📂 Stockage et Organisation":
     uploaded_files = st.file_uploader("Choisissez des fichiers", accept_multiple_files=True)
     if uploaded_files:
         for file in uploaded_files:
-            st.write(f"Fichier téléchargé : {file.name}")
-            
+            # Sauvegarde du fichier téléchargé
+            with open(os.path.join(storage_directory, file.name), "wb") as f:
+                f.write(file.getbuffer())
+            st.success(f"Fichier '{file.name}' téléchargé et sauvegardé.")
+    
+    # Affichage des fichiers téléchargés
+    st.subheader("Fichiers téléchargés")
+    files = os.listdir(storage_directory)
+    if files:
+        for file in files:
+            file_path = os.path.join(storage_directory, file)
+            if st.button(f"Voir {file}"):
+                with open(file_path, "rb") as f:
+                    content = f.read()
+                    st.download_button(label=f"Télécharger {file}", data=content, file_name=file)
+
     # Création de dossiers
     folder_name = st.text_input("Créer un nouveau dossier")
     if st.button("Créer Dossier"):
-        st.write(f"Dossier '{folder_name}' créé.")
+        new_folder_path = os.path.join(storage_directory, folder_name)
+        if not os.path.exists(new_folder_path):
+            os.makedirs(new_folder_path)
+            st.success(f"Dossier '{folder_name}' créé.")
+        else:
+            st.warning(f"Le dossier '{folder_name}' existe déjà.")
 
 # Fonctionnalité de recherche
 elif section == "🔍 Recherche":
