@@ -91,7 +91,28 @@ storage_directory = "uploaded_files"
 if not os.path.exists(storage_directory):
     os.makedirs(storage_directory)
 
-elif section == "📂 Stockage et Organisation":
+def display_file(file_path):
+    file_extension = file_path.split('.')[-1].lower()
+    if file_extension in ["txt", "py", "md"]:
+        with open(file_path, "r", encoding="utf-8") as file:
+            content = file.read()
+            st.text(content)
+    elif file_extension in ["jpg", "jpeg", "png", "gif"]:
+        st.image(file_path)
+    elif file_extension in ["pdf"]:
+        with open(file_path, "rb") as file:
+            st.download_button(label=f"Télécharger {file_path}", data=file, file_name=os.path.basename(file_path))
+            st.write("Pour voir le PDF, téléchargez-le.")
+    else:
+        st.write(f"Format de fichier non pris en charge : {file_extension}")
+
+if 'section' not in st.session_state:
+    st.session_state['section'] = None
+
+st.session_state['section'] = "📂 Stockage et Organisation"
+section = st.session_state['section']
+
+if section == "📂 Stockage et Organisation":
     add_bg_image()
     st.header("Stockage et Organisation des Connaissances")
     st.write("Téléchargez et organisez vos documents ici.")
@@ -100,8 +121,9 @@ elif section == "📂 Stockage et Organisation":
     uploaded_files = st.file_uploader("Choisissez des fichiers", accept_multiple_files=True)
     if uploaded_files:
         for file in uploaded_files:
+            file_path = os.path.join(storage_directory, file.name)
             # Sauvegarde du fichier téléchargé
-            with open(os.path.join(storage_directory, file.name), "wb") as f:
+            with open(file_path, "wb") as f:
                 f.write(file.getbuffer())
             st.success(f"Fichier '{file.name}' téléchargé et sauvegardé.")
     
@@ -112,9 +134,7 @@ elif section == "📂 Stockage et Organisation":
         for file in files:
             file_path = os.path.join(storage_directory, file)
             if st.button(f"Voir {file}"):
-                with open(file_path, "rb") as f:
-                    content = f.read()
-                    st.download_button(label=f"Télécharger {file}", data=content, file_name=file)
+                display_file(file_path)
 
     # Création de dossiers
     folder_name = st.text_input("Créer un nouveau dossier")
