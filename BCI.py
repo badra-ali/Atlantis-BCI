@@ -93,7 +93,7 @@ if not os.path.exists(storage_directory):
 
 def display_file(file_path):
     file_extension = file_path.split('.')[-1].lower()
-    if file_extension in ["txt", "py", "md"]:
+    if file_extension in ["txt", "py", "md","docx"]:
         with open(file_path, "r", encoding="utf-8") as file:
             content = file.read()
             st.text(content)
