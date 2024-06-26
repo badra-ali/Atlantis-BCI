@@ -99,12 +99,17 @@ if section == "📂 Stockage et Organisation":
                 st.text(content)
         elif file_extension in ["jpg", "jpeg", "png", "gif"]:
             st.image(file_path)
-        elif file_extension in ["pdf","docx"]:
+        elif file_extension in ["pdf"]:
             with open(file_path, "rb") as file:
                 st.download_button(label=f"Télécharger {file_path}", data=file, file_name=os.path.basename(file_path))
                 st.write("Pour voir le PDF, téléchargez-le.")
         else:
             st.write(f"Format de fichier non pris en charge : {file_extension}")
+    
+    def delete_file(file_path):
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            st.success(f"Fichier '{os.path.basename(file_path)}' supprimé.")
     
     if 'section' not in st.session_state:
         st.session_state['section'] = None
@@ -133,8 +138,16 @@ if section == "📂 Stockage et Organisation":
         if files:
             for file in files:
                 file_path = os.path.join(storage_directory, file)
-                if st.button(f"Voir {file}"):
-                    display_file(file_path)
+                col1, col2, col3 = st.columns([4, 1, 1])
+                with col1:
+                    st.write(file)
+                with col2:
+                    if st.button(f"Voir", key=f"view_{file}"):
+                        display_file(file_path)
+                with col3:
+                    if st.button(f"Supprimer", key=f"delete_{file}"):
+                        delete_file(file_path)
+                        st.experimental_rerun()
     
         # Création de dossiers
         folder_name = st.text_input("Créer un nouveau dossier")
