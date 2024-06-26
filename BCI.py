@@ -99,7 +99,7 @@ if section == "📂 Stockage et Organisation":
                 st.text(content)
         elif file_extension in ["jpg", "jpeg", "png", "gif"]:
             st.image(file_path)
-        elif file_extension in ["pdf"]:
+        elif file_extension in ["pdf","docx"]:
             with open(file_path, "rb") as file:
                 st.download_button(label=f"Télécharger {file_path}", data=file, file_name=os.path.basename(file_path))
                 st.write("Pour voir le PDF, téléchargez-le.")
