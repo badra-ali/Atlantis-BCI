@@ -20,11 +20,12 @@ def analyze_sentiment(text):
         inputs = tokenizer(text, max_length=max_length, truncation=True, return_tensors='tf')
         
         sentiment_analyzer = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer, framework="tf")
-        result = sentiment_analyzer(inputs)
+        result = sentiment_analyzer(text)
         return result
     
     except Exception as e:
         return str(e)  # Gérer les erreurs de chargement de modèle ici
+
 # Option de thème
 theme = st.sidebar.selectbox("Choisissez le thème", ["Clair", "Sombre"])
 
