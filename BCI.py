@@ -12,16 +12,22 @@ st.set_page_config(page_title="Analyse de sentiment", layout="wide")
 
 def analyze_sentiment(text):
     try:
-        model_name = "nlptown/bert-base-multilingual-uncased-sentiment"  # Exemple de modèle de sentiment
+        model_name = "nlptown/bert-base-multilingual-uncased-sentiment"
         tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = AutoModelForSequenceClassification.from_pretrained(model_name)
-        sentiment_analyzer = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer)
+        model = TFAutoModelForSequenceClassification.from_pretrained(model_name)
+        
+        # Transformer le modèle en fonction d'analyse de sentiment
+        def sentiment_analyzer(text):
+            inputs = tokenizer(text, return_tensors="tf", padding=True, truncation=True)
+            outputs = model(inputs)
+            predictions = tf.argmax(outputs.logits, axis=1).numpy()
+            return predictions
         
         result = sentiment_analyzer(text)
         return result
     
     except Exception as e:
-        return str(e)  # Gérer les erreurs de chargement de modèle ici
+        return str(e)  # Gérer les erreurs de chargement du modèle ici
 
 # Option de thème
 theme = st.sidebar.selectbox("Choisissez le thème", ["Clair", "Sombre"])
