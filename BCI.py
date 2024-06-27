@@ -10,6 +10,12 @@ import torch
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Analyse de sentiment", layout="wide")
 
+# Initialiser le répertoire de stockage au début du script
+storage_directory = "uploaded_files"
+if not os.path.exists(storage_directory):
+    os.makedirs(storage_directory)
+st.session_state['storage_directory'] = storage_directory
+
 # Fonction pour diviser le texte en morceaux
 def split_text_into_chunks(text, tokenizer, max_chunk_size):
     tokens = tokenizer(text, return_tensors='pt', truncation=False)['input_ids'][0]
@@ -205,12 +211,6 @@ if section == "📂 Stockage et Organisation":
                 st.success(f"Dossier '{folder_name}' créé.")
             else:
                 st.warning(f"Le dossier '{folder_name}' existe déjà.")
-
-    # Stocker le chemin du répertoire de stockage dans st.session_state
-    storage_directory = uploaded_files
-    if not os.path.exists(storage_directory):
-        os.makedirs(storage_directory)
-    st.session_state['storage_directory'] = storage_directory
 
 elif section == "🔍 Recherche":
     add_bg_image()
