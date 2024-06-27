@@ -4,32 +4,30 @@ from streamlit_tags import st_tags  # For tag functionality
 from PIL import Image
 import PyPDF2
 import textract
-from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
+from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
 
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Analyse de sentiment", layout="wide")
 
-def analyze_sentiment(text):
+def summarize_text(text):
     try:
-        model_name = "nlptown/bert-base-multilingual-uncased-sentiment"  # Exemple de modèle de sentiment
+        model_name = "facebook/bart-large-cnn"
         tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = AutoModelForSequenceClassification.from_pretrained(model_name)
-        
-        # Troncature du texte pour ne pas dépasser la longueur maximale de séquence
-        max_length = 512
-        tokens = tokenizer(text, max_length=max_length, truncation=True, return_tensors='pt')
-        
-        sentiment_analyzer = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer)
-        
-        # Convertir les tokens en texte pour le pipeline
-        truncated_text = tokenizer.decode(tokens['input_ids'][0], skip_special_tokens=True)
-        
-        result = sentiment_analyzer(truncated_text)
-        return result
+        model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+
+        summarizer = pipeline("summarization", model=model, tokenizer=tokenizer)
+
+        # Diviser le texte en segments si nécessaire pour gérer les longues séquences
+        max_length = 1024  # Longueur maximale pour le modèle BART
+        inputs = tokenizer.batch_encode_plus([text], max_length=max_length, return_tensors='pt', truncation=True)
+
+        summary = summarizer(text, max_length=150, min_length=30, do_sample=False)
+
+        return summary[0]['summary_text']
     
     except Exception as e:
-        return str(e)  # Gérer les erreurs de chargement de modèle ici
+        return str(e)  # Gérer les erreurs ici
         
 # Option de thème
 theme = st.sidebar.selectbox("Choisissez le thème", ["Clair", "Sombre"])
