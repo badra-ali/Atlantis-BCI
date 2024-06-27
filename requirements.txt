@@ -1,8 +1,10 @@
 pip == 24.1.1
 tensorflow
+tf-keras
 streamlit
 streamlit_tags
 PyPDF2
 textract
 Pillow
 transformers
+
