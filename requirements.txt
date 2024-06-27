@@ -4,4 +4,6 @@ PyPDF2
 textract
 Pillow
 transformers
-torch torchvision torchaudio
+torch 
+torchvision
+torchaudio
