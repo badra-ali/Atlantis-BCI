@@ -10,11 +10,7 @@ import torch
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Analyse de sentiment", layout="wide")
 
-# Chemin du répertoire de stockage
-storage_directory = "uploaded_files"
-if not os.path.exists(storage_directory):
-    os.makedirs(storage_directory)
-
+# Fonction pour diviser le texte en morceaux
 def split_text_into_chunks(text, tokenizer, max_chunk_size):
     tokens = tokenizer(text, return_tensors='pt', truncation=False)['input_ids'][0]
     chunks = []
@@ -23,16 +19,15 @@ def split_text_into_chunks(text, tokenizer, max_chunk_size):
         chunks.append(chunk)
     return chunks
 
+# Fonction pour résumer le texte
 def summarize_text(text):
     try:
         model_name = "facebook/bart-large-cnn"
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
-
         summarizer = pipeline("summarization", model=model, tokenizer=tokenizer)
 
-        max_chunk_size = 512  # Define the max chunk size based on the model's capacity
-
+        max_chunk_size = 512  # Taille maximale des morceaux
         chunks = split_text_into_chunks(text, tokenizer, max_chunk_size)
 
         summaries = []
@@ -123,7 +118,6 @@ if section == "🏠 Accueil":
     """)
 
 if section == "📂 Stockage et Organisation":
-    
     def extract_content(file_path):
         file_extension = file_path.split('.')[-1].lower()
         content = ""
@@ -211,7 +205,13 @@ if section == "📂 Stockage et Organisation":
                 st.success(f"Dossier '{folder_name}' créé.")
             else:
                 st.warning(f"Le dossier '{folder_name}' existe déjà.")
-    
+
+    # Stocker le chemin du répertoire de stockage dans st.session_state
+    storage_directory = "uploaded_files"
+    if not os.path.exists(storage_directory):
+        os.makedirs(storage_directory)
+    st.session_state['storage_directory'] = storage_directory
+
 elif section == "🔍 Recherche":
     add_bg_image()
     st.header("Recherche et Extraction de Connaissances")
@@ -229,11 +229,12 @@ elif section == "🔍 Recherche":
             
             # Charger un modèle de question-réponse de transformers
             model_name = "deepset/roberta-base-squad2"
-            tokenizer = AutoTokenizer.from_pretrained(model_name)
-            model = AutoModelForQuestionAnswering.from_pretrained(model_name)
-            nlp = pipeline("question-answering", model=model, tokenizer=tokenizer)
+            nlp = pipeline("question-answering", model=model_name)
             
-            # Parcourir les fichiers de la bibliothèque pour extraire leur contenu
+            # Récupérer le répertoire de stockage depuis st.session_state
+            storage_directory = st.session_state.get('storage_directory', 'uploaded_files')
+            
+            # Extraire le contenu des fichiers de la bibliothèque
             library_contents = []
             for file in os.listdir(storage_directory):
                 file_path = os.path.join(storage_directory, file)
