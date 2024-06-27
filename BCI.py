@@ -10,6 +10,11 @@ import torch
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Analyse de sentiment", layout="wide")
 
+# Chemin du répertoire de stockage
+storage_directory = "uploaded_files"
+if not os.path.exists(storage_directory):
+    os.makedirs(storage_directory)
+
 def split_text_into_chunks(text, tokenizer, max_chunk_size):
     tokens = tokenizer(text, return_tensors='pt', truncation=False)['input_ids'][0]
     chunks = []
@@ -118,9 +123,6 @@ if section == "🏠 Accueil":
     """)
 
 if section == "📂 Stockage et Organisation":
-    storage_directory = "uploaded_files"
-    if not os.path.exists(storage_directory):
-        os.makedirs(storage_directory)
     
     def extract_content(file_path):
         file_extension = file_path.split('.')[-1].lower()
@@ -231,10 +233,9 @@ elif section == "🔍 Recherche":
             model = AutoModelForQuestionAnswering.from_pretrained(model_name)
             nlp = pipeline("question-answering", model=model, tokenizer=tokenizer)
             
-            # Parcourir les fichiers de la bibliothèque et rechercher la réponse
-            files = os.listdir(storage_directory)
+            # Parcourir les fichiers de la bibliothèque pour extraire leur contenu
             library_contents = []
-            for file in files:
+            for file in os.listdir(storage_directory):
                 file_path = os.path.join(storage_directory, file)
                 content = extract_content(file_path)
                 library_contents.append(content)
