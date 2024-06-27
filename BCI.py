@@ -226,8 +226,6 @@ if section == "📂 Stockage et Organisation":
             results = [sentiment_analyzer(text) for text in texts]
             return results
         
-        # Configuration de la page Streamlit
-        st.set_page_config(page_title="Analyse de sentiment", layout="wide")
         st.header("Téléversez des documents pour l'analyse de sentiment")
         
         # Téléchargement de fichiers
