@@ -5,7 +5,6 @@ from PIL import Image
 import PyPDF2
 import textract
 from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
-import torch
 
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Analyse de sentiment", layout="wide")
