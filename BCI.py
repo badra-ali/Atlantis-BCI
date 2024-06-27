@@ -10,10 +10,13 @@ import torch
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Analyse de sentiment", layout="wide")
 
-def split_text(text, max_chunk_size=512):
-    # Diviser le texte en segments plus petits pour éviter les dépassements de longueur
-    words = text.split()
-    chunks = [' '.join(words[i:i + max_chunk_size]) for i in range(0, len(words), max_chunk_size)]
+def split_text_into_chunks(text, tokenizer, max_chunk_size):
+    # Tokenize the text and split into chunks that fit within max_chunk_size
+    tokens = tokenizer(text, return_tensors='pt', truncation=False)['input_ids'][0]
+    chunks = []
+    for i in range(0, len(tokens), max_chunk_size):
+        chunk = tokens[i:i + max_chunk_size]
+        chunks.append(chunk)
     return chunks
 
 def summarize_text(text):
@@ -24,22 +27,22 @@ def summarize_text(text):
 
         summarizer = pipeline("summarization", model=model, tokenizer=tokenizer)
 
-        # Diviser le texte en segments si nécessaire pour gérer les longues séquences
-        chunks = split_text(text)
+        max_chunk_size = 512  # Define the max chunk size based on the model's capacity
 
-        # Résumer chaque segment et combiner les résumés
+        # Split the text into smaller chunks that the model can handle
+        chunks = split_text_into_chunks(text, tokenizer, max_chunk_size)
+
         summaries = []
         for chunk in chunks:
-            summary = summarizer(chunk, max_length=150, min_length=30, do_sample=False)
+            chunk_text = tokenizer.decode(chunk, skip_special_tokens=True)
+            summary = summarizer(chunk_text, max_length=150, min_length=30, do_sample=False)
             summaries.append(summary[0]['summary_text'])
 
-        # Combiner les résumés des segments
         combined_summary = ' '.join(summaries)
-
         return combined_summary
 
     except Exception as e:
-        return str(e)  # Gérer les erreurs ici
+        return str(e)  # Handle errors here
         
 # Option de thème
 theme = st.sidebar.selectbox("Choisissez le thème", ["Clair", "Sombre"])
