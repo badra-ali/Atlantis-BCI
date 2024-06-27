@@ -190,68 +190,6 @@ if section == "📂 Stockage et Organisation":
                 st.warning(f"Le dossier '{folder_name}' existe déjà.")
 
 
-        
-        # Fonction pour extraire le texte des fichiers PDF
-        def extract_text_from_pdf(file_path):
-            with open(file_path, 'rb') as file:
-                reader = PdfReader(file)
-                text = ""
-                for page_num in range(len(reader.pages)):
-                    page = reader.pages[page_num]
-                    text += page.extract_text()
-            return text
-        
-        # Fonction pour extraire le texte des fichiers DOCX, TXT, etc.
-        def extract_text(file_path):
-            text = textract.process(file_path).decode('utf-8')
-            return text
-        
-        # Définir une fonction pour traiter les fichiers téléchargés
-        def process_uploaded_files(uploaded_files):
-            contents = []
-            for uploaded_file in uploaded_files:
-                file_path = os.path.join("uploaded_files", uploaded_file.name)
-                with open(file_path, "wb") as f:
-                    f.write(uploaded_file.getbuffer())
-                if uploaded_file.name.endswith(".pdf"):
-                    text = extract_text_from_pdf(file_path)
-                else:
-                    text = extract_text(file_path)
-                contents.append((uploaded_file.name, text))
-            return contents
-        
-        # Analyse de sentiment
-        def analyze_sentiment(texts):
-            sentiment_analyzer = pipeline("sentiment-analysis")
-            results = [sentiment_analyzer(text) for text in texts]
-            return results
-        
-        st.header("Téléversez des documents pour l'analyse de sentiment")
-        
-        # Téléchargement de fichiers
-        uploaded_files = st.file_uploader("Choisissez des fichiers", accept_multiple_files=True)
-        
-        if uploaded_files:
-            # Créer un dossier pour les fichiers téléchargés
-            if not os.path.exists("uploaded_files"):
-                os.makedirs("uploaded_files")
-        
-            # Traiter les fichiers téléchargés
-            contents = process_uploaded_files(uploaded_files)
-            
-            # Afficher les fichiers téléchargés et leurs contenus
-            for file_name, content in contents:
-                st.write(f"### {file_name}")
-                st.write(content)
-                
-                # Analyser le sentiment
-                sentiment = analyze_sentiment([content])
-                st.write("### Sentiment Analysis")
-                st.write(sentiment)
-        
-            # Supprimer les fichiers après traitement
-            for uploaded_file in uploaded_files:
-                os.remove(os.path.join("uploaded_files", uploaded_file.name))
             
 # Fonctionnalité de recherche
 elif section == "🔍 Recherche":
