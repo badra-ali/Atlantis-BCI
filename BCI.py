@@ -4,7 +4,7 @@ from streamlit_tags import st_tags  # For tag functionality
 from PIL import Image
 import PyPDF2
 import textract
-from transformers import AutoModelForSequenceClassification, AutoTokenizer 
+from transformers import pipeline, AutoTokenizer, TFAutoModelForSequenceClassification
 
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Analyse de sentiment", layout="wide")
@@ -13,8 +13,8 @@ def analyze_sentiment(text):
     try:
         model_name = "nlptown/bert-base-multilingual-uncased-sentiment"  # Exemple de modèle de sentiment
         tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = AutoModelForSequenceClassification.from_pretrained(model_name)
-        sentiment_analyzer = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer)
+        model = TFAutoModelForSequenceClassification.from_pretrained(model_name)  # Utilisation de TFAutoModelForSequenceClassification
+        sentiment_analyzer = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer, framework="tf")  # Spécification du framework TensorFlow
         
         result = sentiment_analyzer(text)
         return result
