@@ -88,168 +88,47 @@ if section == "🏠 Accueil":
 
 
 if section == "📂 Stockage et Organisation":
-    # Fonction pour extraire le texte des fichiers PDF
-    def extract_text_from_pdf(file_path):
-        with open(file_path, 'rb') as file:
-            reader = PdfReader(file)
-            text = ""
-            for page_num in range(len(reader.pages)):
-                page = reader.pages[page_num]
-                text += page.extract_text()
-        return text
-    
-    # Fonction pour extraire le texte des fichiers DOCX, TXT, etc.
-    def extract_text(file_path):
-        text = textract.process(file_path).decode('utf-8')
-        return text
-    
-    # Définir une fonction pour traiter les fichiers téléchargés
-    def process_uploaded_files(uploaded_files):
-        contents = []
-        for uploaded_file in uploaded_files:
-            file_path = os.path.join("uploaded_files", uploaded_file.name)
-            with open(file_path, "wb") as f:
-                f.write(uploaded_file.getbuffer())
-            if uploaded_file.name.endswith(".pdf"):
-                text = extract_text_from_pdf(file_path)
-            else:
-                text = extract_text(file_path)
-            contents.append((uploaded_file.name, text))
-        return contents
+    # Fonction pour extraire le contenu des fichiers PDF
+    def extract_content(file_path):
+        content = ""
+        with open(file_path, 'rb') as f:
+            reader = PdfFileReader(f)
+            num_pages = reader.getNumPages()
+            for page_num in range(num_pages):
+                page = reader.getPage(page_num)
+                content += page.extractText()
+        return content
     
     # Analyse de sentiment
-    def analyze_sentiment(texts):
+    def analyze_sentiment(text):
         sentiment_analyzer = pipeline("sentiment-analysis")
-        results = [sentiment_analyzer(text) for text in texts]
-        return results
+        result = sentiment_analyzer(text)
+        return result
     
-    st.header("Téléversez des documents pour l'analyse de sentiment")
-    
-    # Téléchargement de fichiers
+    # Interface utilisateur Streamlit
     uploaded_files = st.file_uploader("Choisissez des fichiers", accept_multiple_files=True)
     
     if uploaded_files:
-        # Créer un dossier pour les fichiers téléchargés
-        if not os.path.exists("uploaded_files"):
-            os.makedirs("uploaded_files")
-    
-        # Traiter les fichiers téléchargés
-        contents = process_uploaded_files(uploaded_files)
-        
-        # Afficher les fichiers téléchargés et leurs contenus
-        for file_name, content in contents:
-            st.write(f"### {file_name}")
+        for file_num, uploaded_file in enumerate(uploaded_files):
+            # Sauvegarde du fichier téléchargé temporairement
+            file_path = os.path.join("temp_files", f"file_{file_num}_{uploaded_file.name}")
+            with open(file_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+            
+            # Extraction du contenu du fichier PDF
+            content = extract_content(file_path)
+            
+            # Affichage du contenu extrait
+            st.write(f"Contenu extrait du fichier {uploaded_file.name} :")
             st.write(content)
             
-            # Analyser le sentiment
-            sentiment = analyze_sentiment([content])
-            st.write("### Sentiment Analysis")
-            st.write(sentiment)
-    
-        # Supprimer les fichiers après traitement
-        for uploaded_file in uploaded_files:
-            os.remove(os.path.join("uploaded_files", uploaded_file.name))
-
-# Fonctionnalité de stockage et d'organisation
-if section == "📂 Stockage et Organisation":
-    # Initialisation du répertoire de stockage
-    storage_directory = "uploaded_files"
-    if not os.path.exists(storage_directory):
-        os.makedirs(storage_directory)
-    
-    # Fonction pour extraire le contenu des fichiers
-    def extract_content(file_path):
-        file_extension = file_path.split('.')[-1].lower()
-        content = ""
-        if file_extension in ["txt", "py", "md"]:
-            with open(file_path, "r", encoding="utf-8") as file:
-                content = file.read()
-        elif file_extension in ["jpg", "jpeg", "png", "gif"]:
-            content = f"[Image: {file_path}]"
-        elif file_extension == "pdf":
-            with open(file_path, "rb") as file:
-                reader = PyPDF2.PdfReader(file)
-                for page_num in range(len(reader.pages)):
-                    page = reader.pages[page_num]
-                    content += page.extract_text()
-        else:
-            content = textract.process(file_path).decode('utf-8')
-        return content
-    
-    # Fonction pour afficher le contenu des fichiers
-    def display_file(file_path):
-        file_extension = file_path.split('.')[-1].lower()
-        if file_extension in ["txt", "py", "md"]:
-            with open(file_path, "r", encoding="utf-8") as file:
-                content = file.read()
-                st.text(content)
-        elif file_extension in ["jpg", "jpeg", "png", "gif"]:
-            st.image(file_path)
-        elif file_extension == "pdf":
-            with open(file_path, "rb") as file:
-                st.download_button(label=f"Télécharger {file_path}", data=file, file_name=os.path.basename(file_path))
-                st.write("Pour voir le PDF, téléchargez-le.")
-        else:
-            st.write(f"Format de fichier non pris en charge : {file_extension}")
-    
-    # Fonction pour supprimer un fichier
-    def delete_file(file_path):
-        if os.path.exists(file_path):
+            # Analyse de sentiment
+            sentiment_result = analyze_sentiment(content)
+            st.write(f"Résultat de l'analyse de sentiment du fichier {uploaded_file.name} :")
+            st.write(sentiment_result)
+            
+            # Suppression du fichier temporaire après utilisation
             os.remove(file_path)
-            st.success(f"Fichier '{os.path.basename(file_path)}' supprimé.")
-    
-    if 'section' not in st.session_state:
-        st.session_state['section'] = None
-    
-    st.session_state['section'] = "📂 Stockage et Organisation"
-    section = st.session_state['section']
-    
-    if section == "📂 Stockage et Organisation":
-        add_bg_image()
-        st.header("Stockage et Organisation des Connaissances")
-        st.write("Téléchargez et organisez vos documents ici.")
-        
-        # Téléchargement de fichiers
-        uploaded_files = st.file_uploader("Choisissez des fichiers", accept_multiple_files=True)
-        if uploaded_files:
-            for file in uploaded_files:
-                file_path = os.path.join(storage_directory, file.name)
-                # Sauvegarde du fichier téléchargé
-                with open(file_path, "wb") as f:
-                    f.write(file.getbuffer())
-                st.success(f"Fichier '{file.name}' téléchargé et sauvegardé.")
-        
-        # Affichage des fichiers téléchargés
-        st.subheader("Fichiers téléchargés")
-        files = os.listdir(storage_directory)
-        if files:
-            for file in files:
-                file_path = os.path.join(storage_directory, file)
-                col1, col2, col3 = st.columns([4, 1, 1])
-                with col1:
-                    st.write(file)
-                with col2:
-                    if st.button(f"Voir", key=f"view_{file}"):
-                        display_file(file_path)
-                with col3:
-                    if st.button(f"Supprimer", key=f"delete_{file}"):
-                        delete_file(file_path)
-                        st.experimental_rerun()
-                # Extraction et affichage du contenu
-                content = extract_content(file_path)
-                if content:
-                    st.write(f"**Contenu extrait de {file} :**")
-                    st.text_area(label="", value=content, height=300)
-    
-        # Création de dossiers
-        folder_name = st.text_input("Créer un nouveau dossier")
-        if st.button("Créer Dossier"):
-            new_folder_path = os.path.join(storage_directory, folder_name)
-            if not os.path.exists(new_folder_path):
-                os.makedirs(new_folder_path)
-                st.success(f"Dossier '{folder_name}' créé.")
-            else:
-                st.warning(f"Le dossier '{folder_name}' existe déjà.")
 
 
             
