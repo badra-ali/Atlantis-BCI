@@ -1,6 +1,9 @@
 import streamlit as st
 import os
 from streamlit_tags import st_tags  # For tag functionality
+from PIL import Image
+import PyPDF2
+import textract
 
 # Configuration de la page
 st.set_page_config(page_title="AtlantisBCI", layout="wide")
@@ -91,6 +94,26 @@ if section == "📂 Stockage et Organisation":
     if not os.path.exists(storage_directory):
         os.makedirs(storage_directory)
     
+    # Fonction pour extraire le contenu des fichiers
+    def extract_content(file_path):
+        file_extension = file_path.split('.')[-1].lower()
+        content = ""
+        if file_extension in ["txt", "py", "md"]:
+            with open(file_path, "r", encoding="utf-8") as file:
+                content = file.read()
+        elif file_extension in ["jpg", "jpeg", "png", "gif"]:
+            content = f"[Image: {file_path}]"
+        elif file_extension == "pdf":
+            with open(file_path, "rb") as file:
+                reader = PyPDF2.PdfFileReader(file)
+                for page_num in range(reader.getNumPages()):
+                    page = reader.getPage(page_num)
+                    content += page.extract_text()
+        else:
+            content = textract.process(file_path).decode('utf-8')
+        return content
+    
+    # Fonction pour afficher le contenu des fichiers
     def display_file(file_path):
         file_extension = file_path.split('.')[-1].lower()
         if file_extension in ["txt", "py", "md"]:
@@ -99,13 +122,14 @@ if section == "📂 Stockage et Organisation":
                 st.text(content)
         elif file_extension in ["jpg", "jpeg", "png", "gif"]:
             st.image(file_path)
-        elif file_extension in ["pdf"]:
+        elif file_extension == "pdf":
             with open(file_path, "rb") as file:
                 st.download_button(label=f"Télécharger {file_path}", data=file, file_name=os.path.basename(file_path))
                 st.write("Pour voir le PDF, téléchargez-le.")
         else:
             st.write(f"Format de fichier non pris en charge : {file_extension}")
     
+    # Fonction pour supprimer un fichier
     def delete_file(file_path):
         if os.path.exists(file_path):
             os.remove(file_path)
@@ -148,6 +172,11 @@ if section == "📂 Stockage et Organisation":
                     if st.button(f"Supprimer", key=f"delete_{file}"):
                         delete_file(file_path)
                         st.experimental_rerun()
+                # Extraction et affichage du contenu
+                content = extract_content(file_path)
+                if content:
+                    st.write(f"**Contenu extrait de {file} :**")
+                    st.text_area(label="", value=content, height=300)
     
         # Création de dossiers
         folder_name = st.text_input("Créer un nouveau dossier")
@@ -158,7 +187,6 @@ if section == "📂 Stockage et Organisation":
                 st.success(f"Dossier '{folder_name}' créé.")
             else:
                 st.warning(f"Le dossier '{folder_name}' existe déjà.")
-
 # Fonctionnalité de recherche
 elif section == "🔍 Recherche":
     add_bg_image()
