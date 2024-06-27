@@ -4,8 +4,8 @@ from streamlit_tags import st_tags  # For tag functionality
 from PIL import Image
 import PyPDF2
 import textract
-from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
-import torch
+from transformers import TFAutoModelForSequenceClassification, AutoTokenizer
+import tensorflow as tf 
 
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Analyse de sentiment", layout="wide")
