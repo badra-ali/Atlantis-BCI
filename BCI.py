@@ -4,14 +4,13 @@ from streamlit_tags import st_tags  # For tag functionality
 from PIL import Image
 import PyPDF2
 import textract
-from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM
+from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM, AutoModelForQuestionAnswering
 import torch
 
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Analyse de sentiment", layout="wide")
 
 def split_text_into_chunks(text, tokenizer, max_chunk_size):
-    # Tokenize the text and split into chunks that fit within max_chunk_size
     tokens = tokenizer(text, return_tensors='pt', truncation=False)['input_ids'][0]
     chunks = []
     for i in range(0, len(tokens), max_chunk_size):
@@ -29,7 +28,6 @@ def summarize_text(text):
 
         max_chunk_size = 512  # Define the max chunk size based on the model's capacity
 
-        # Split the text into smaller chunks that the model can handle
         chunks = split_text_into_chunks(text, tokenizer, max_chunk_size)
 
         summaries = []
@@ -42,8 +40,8 @@ def summarize_text(text):
         return combined_summary
 
     except Exception as e:
-        return str(e)  # Handle errors here
-        
+        return str(e)
+
 # Option de thème
 theme = st.sidebar.selectbox("Choisissez le thème", ["Clair", "Sombre"])
 
@@ -111,10 +109,8 @@ def add_bg_image():
         unsafe_allow_html=True
     )
 
-# Exemple d'utilisation dans la section Accueil
-#section = "🏠 Accueil"  # Cette variable peut être modifiée selon votre logique de navigation
 if section == "🏠 Accueil":
-    add_bg_image()  # Ajout de l'image en arrière-plan
+    add_bg_image()
     st.header("Bienvenue sur AtlantisBCI")
     st.write("""
     La Base de Connaissance Intelligente (BCI) est conçue pour améliorer la gestion des connaissances et la productivité.
@@ -122,12 +118,10 @@ if section == "🏠 Accueil":
     """)
 
 if section == "📂 Stockage et Organisation":
-    # Initialisation du répertoire de stockage
     storage_directory = "uploaded_files"
     if not os.path.exists(storage_directory):
         os.makedirs(storage_directory)
     
-    # Fonction pour extraire le contenu des fichiers
     def extract_content(file_path):
         file_extension = file_path.split('.')[-1].lower()
         content = ""
@@ -146,7 +140,6 @@ if section == "📂 Stockage et Organisation":
             content = textract.process(file_path).decode('utf-8')
         return content
     
-    # Fonction pour afficher le contenu des fichiers
     def display_file(file_path):
         file_extension = file_path.split('.')[-1].lower()
         if file_extension in ["txt", "py", "md"]:
@@ -162,7 +155,6 @@ if section == "📂 Stockage et Organisation":
         else:
             st.write(f"Format de fichier non pris en charge : {file_extension}")
     
-    # Fonction pour supprimer un fichier
     def delete_file(file_path):
         if os.path.exists(file_path):
             os.remove(file_path)
@@ -179,17 +171,14 @@ if section == "📂 Stockage et Organisation":
         st.header("Stockage et Organisation des Connaissances")
         st.write("Téléchargez et organisez vos documents ici.")
         
-        # Téléchargement de fichiers
         uploaded_files = st.file_uploader("Choisissez des fichiers", accept_multiple_files=True)
         if uploaded_files:
             for file in uploaded_files:
                 file_path = os.path.join(storage_directory, file.name)
-                # Sauvegarde du fichier téléchargé
                 with open(file_path, "wb") as f:
                     f.write(file.getbuffer())
                 st.success(f"Fichier '{file.name}' téléchargé et sauvegardé.")
         
-        # Affichage des fichiers téléchargés
         st.subheader("Fichiers téléchargés")
         files = os.listdir(storage_directory)
         if files:
@@ -205,7 +194,6 @@ if section == "📂 Stockage et Organisation":
                     if st.button(f"Supprimer", key=f"delete_{file}"):
                         delete_file(file_path)
                         st.experimental_rerun()
-                # Extraction et affichage du contenu
                 content = extract_content(file_path)
                 if content:
                     st.write(f"**Contenu extrait de {file} :**")
@@ -213,7 +201,6 @@ if section == "📂 Stockage et Organisation":
                     sentiment_result = summarize_text(content)
                     st.write(sentiment_result)
                     
-        # Création de dossiers
         folder_name = st.text_input("Créer un nouveau dossier")
         if st.button("Créer Dossier"):
             new_folder_path = os.path.join(storage_directory, folder_name)
@@ -222,41 +209,51 @@ if section == "📂 Stockage et Organisation":
                 st.success(f"Dossier '{folder_name}' créé.")
             else:
                 st.warning(f"Le dossier '{folder_name}' existe déjà.")
-
-            
-# Fonctionnalité de recherche
+    
 elif section == "🔍 Recherche":
     add_bg_image()
     st.header("Recherche et Extraction de Connaissances")
     
-    # Sélection du type de recherche
     search_type = st.radio("Type de recherche", ["Web", "Bibliothèque", "Base de Connaissance"])
     search_query = st.text_input("Entrez votre requête de recherche")
     
     if st.button("Rechercher"):
         if search_type == "Web":
             st.write(f"Recherche sur le Web pour '{search_query}' :")
-            # Simuler des résultats de recherche sur le web
             st.write("Résultat Web 1")
             st.write("Résultat Web 2")
         elif search_type == "Bibliothèque":
             st.write(f"Recherche dans la Bibliothèque pour '{search_query}' :")
-            # Simuler des résultats de recherche dans la bibliothèque
-            st.write("Document Bibliothèque 1")
-            st.write("Document Bibliothèque 2")
+            
+            # Charger un modèle de question-réponse de transformers
+            model_name = "deepset/roberta-base-squad2"
+            tokenizer = AutoTokenizer.from_pretrained(model_name)
+            model = AutoModelForQuestionAnswering.from_pretrained(model_name)
+            nlp = pipeline("question-answering", model=model, tokenizer=tokenizer)
+            
+            # Parcourir les fichiers de la bibliothèque et rechercher la réponse
+            files = os.listdir(storage_directory)
+            library_contents = []
+            for file in files:
+                file_path = os.path.join(storage_directory, file)
+                content = extract_content(file_path)
+                library_contents.append(content)
+            
+            # Combiner tous les contenus en un seul texte pour la recherche
+            combined_content = " ".join(library_contents)
+            result = nlp(question=search_query, context=combined_content)
+            
+            st.write(f"Réponse trouvée : {result['answer']}")
         elif search_type == "Base de Connaissance":
             st.write(f"Recherche dans la Base de Connaissance pour '{search_query}' :")
-            # Simuler des résultats de recherche dans la base de connaissances
             st.write("Document Base de Connaissance 1")
             st.write("Document Base de Connaissance 2")
 
-# Fonctionnalité de collaboration
 elif section == "🤝 Collaboration":
     add_bg_image()
     st.header("Collaboration et Partage")
     st.write("Partagez vos documents et collaborez avec votre équipe ici.")
     
-    # Partage de documents
     share_with = st_tags(
         label="Partagez avec",
         text="Appuyez sur entrée pour ajouter un email",
@@ -266,38 +263,31 @@ elif section == "🤝 Collaboration":
     if st.button("Partager"):
         st.write(f"Documents partagés avec : {', '.join(share_with)}")
         
-    # Ajout de commentaires
     st.text_area("Ajoutez un commentaire")
 
-# Fonctionnalité de sécurité
 elif section == "🔒 Sécurité":
     add_bg_image()
     st.header("Sécurité et Confidentialité")
     st.write("Gérez les paramètres de sécurité et les permissions d'accès.")
     
-    # Gestion des permissions
     user_permissions = st.selectbox("Choisissez un utilisateur", ["User 1", "User 2", "User 3"])
     permission_level = st.radio("Niveau de permission", ["Lecture", "Écriture", "Admin"])
     if st.button("Mettre à jour les permissions"):
         st.write(f"Permissions de {user_permissions} mises à jour vers {permission_level}.")
 
-# Fonctionnalité d'intégration
 elif section == "🔗 Intégration":
     add_bg_image()
     st.header("Intégration et Accessibilité")
     st.write("Intégrez Atlantis BCI avec d'autres outils et applications.")
     
-    # Sélection d'outils à intégrer
     tools = st.multiselect("Choisissez les outils à intégrer", ["Google Drive", "Dropbox", "OneDrive", "Slack"])
     if st.button("Intégrer"):
         st.write(f"Outils intégrés : {', '.join(tools)}")
 
-# Fonctionnalité de gestion de profil utilisateur
 elif section == "👤 Profil Utilisateur":
     add_bg_image()
     st.header("Gestion de Profil Utilisateur")
     
-    # Champs du profil utilisateur
     st.subheader("Informations du Profil")
     username = st.text_input("Nom d'utilisateur", "johndoe")
     email = st.text_input("Email", "johndoe@example.com")
@@ -306,7 +296,6 @@ elif section == "👤 Profil Utilisateur":
     if st.button("Mettre à jour le profil"):
         st.write("Profil mis à jour avec succès!")
     
-    # Afficher les informations du profil
     st.subheader("Votre Profil")
     st.write(f"**Nom d'utilisateur** : {username}")
     st.write(f"**Email** : {email}")
