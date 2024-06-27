@@ -4,31 +4,23 @@ from streamlit_tags import st_tags  # For tag functionality
 from PIL import Image
 import PyPDF2
 import textract
-from transformers import TFAutoModelForSequenceClassification, AutoTokenizer
-import tensorflow as tf 
+from transformers import TFAutoModelForSequenceClassification, AutoTokenizer 
 
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Analyse de sentiment", layout="wide")
 
 def analyze_sentiment(text):
     try:
-        model_name = "nlptown/bert-base-multilingual-uncased-sentiment"
+        model_name = "nlptown/bert-base-multilingual-uncased-sentiment"  # Exemple de modèle de sentiment
         tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = TFAutoModelForSequenceClassification.from_pretrained(model_name)
-        
-        # Transformer le modèle en fonction d'analyse de sentiment
-        def sentiment_analyzer(text):
-            inputs = tokenizer(text, return_tensors="tf", padding=True, truncation=True)
-            outputs = model(inputs)
-            predictions = tf.argmax(outputs.logits, axis=1).numpy()
-            return predictions
+        model = AutoModelForSequenceClassification.from_pretrained(model_name)
+        sentiment_analyzer = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer)
         
         result = sentiment_analyzer(text)
         return result
     
     except Exception as e:
-        return str(e)  # Gérer les erreurs de chargement du modèle ici
-
+        return str(e)  # Gérer les erreurs de chargement de modèle ici
 # Option de thème
 theme = st.sidebar.selectbox("Choisissez le thème", ["Clair", "Sombre"])
 
