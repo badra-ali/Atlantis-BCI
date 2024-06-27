@@ -1,5 +1,5 @@
 streamlit
 streamlit_tags
-PyPDF2==3.0.0
+PyPDF2
 textract
 Pillow
