@@ -1,6 +1,7 @@
 pip == 24.1.1
 tensorflow
 tf-keras
+torch
 streamlit
 streamlit_tags
 PyPDF2
