@@ -10,6 +10,12 @@ import torch
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Analyse de sentiment", layout="wide")
 
+def split_text(text, max_chunk_size=512):
+    # Diviser le texte en segments plus petits pour éviter les dépassements de longueur
+    words = text.split()
+    chunks = [' '.join(words[i:i + max_chunk_size]) for i in range(0, len(words), max_chunk_size)]
+    return chunks
+
 def summarize_text(text):
     try:
         model_name = "facebook/bart-large-cnn"
@@ -19,13 +25,19 @@ def summarize_text(text):
         summarizer = pipeline("summarization", model=model, tokenizer=tokenizer)
 
         # Diviser le texte en segments si nécessaire pour gérer les longues séquences
-        max_length = 1024  # Longueur maximale pour le modèle BART
-        inputs = tokenizer.batch_encode_plus([text], max_length=max_length, return_tensors='pt', truncation=True)
+        chunks = split_text(text)
 
-        summary = summarizer(text, max_length=150, min_length=30, do_sample=False)
+        # Résumer chaque segment et combiner les résumés
+        summaries = []
+        for chunk in chunks:
+            summary = summarizer(chunk, max_length=150, min_length=30, do_sample=False)
+            summaries.append(summary[0]['summary_text'])
 
-        return summary[0]['summary_text']
-    
+        # Combiner les résumés des segments
+        combined_summary = ' '.join(summaries)
+
+        return combined_summary
+
     except Exception as e:
         return str(e)  # Gérer les erreurs ici
         
