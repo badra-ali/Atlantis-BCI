@@ -20,7 +20,7 @@ def analyze_sentiment(text):
         inputs = tokenizer(text, max_length=max_length, truncation=True, return_tensors='tf')
         
         sentiment_analyzer = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer, framework="tf")
-        result = sentiment_analyzer(inputs)
+        result = sentiment_analyzer(inputs) 
         return result
 
     except Exception as e:
