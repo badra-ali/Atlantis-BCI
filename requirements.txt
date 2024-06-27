@@ -1,8 +1,8 @@
 pip == 24.1.1
+tensorflow
 streamlit
 streamlit_tags
 PyPDF2
 textract
 Pillow
 transformers
-tensorflow
