@@ -192,7 +192,7 @@ if section == "📂 Stockage et Organisation":
                 if content:
                     st.write(f"**Contenu extrait de {file} :**")
                     st.text_area(label="", value=content, height=300)
-                    sentiment_result = analyze_sentiment(content)
+                    sentiment_result = analyze_sentiment(["Bonjour je suis super en forme","Tres en collère contre mon boss"])
                     st.write(sentiment_result)
                     
         # Création de dossiers
