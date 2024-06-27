@@ -86,11 +86,11 @@ if section == "🏠 Accueil":
     Utilisez la barre latérale pour naviguer entre les différentes sections de l'application.
     """)
 
-
 if section == "📂 Stockage et Organisation":
-    # Répertoire de stockage des fichiers téléchargés
+    # Initialisation du répertoire de stockage
     storage_directory = "uploaded_files"
-    os.makedirs(storage_directory, exist_ok=True)
+    if not os.path.exists(storage_directory):
+        os.makedirs(storage_directory)
     
     # Fonction pour extraire le contenu des fichiers
     def extract_content(file_path):
@@ -110,12 +110,6 @@ if section == "📂 Stockage et Organisation":
         else:
             content = textract.process(file_path).decode('utf-8')
         return content
-    
-    # Fonction pour analyser le sentiment
-    def analyze_sentiment(text):
-        sentiment_analyzer = pipeline("sentiment-analysis")
-        result = sentiment_analyzer(text)
-        return result
     
     # Fonction pour afficher le contenu des fichiers
     def display_file(file_path):
@@ -139,51 +133,58 @@ if section == "📂 Stockage et Organisation":
             os.remove(file_path)
             st.success(f"Fichier '{os.path.basename(file_path)}' supprimé.")
     
-    # Interface utilisateur Streamlit
-    st.header("Analyse de Sentiment et Organisation des Fichiers")
+    if 'section' not in st.session_state:
+        st.session_state['section'] = None
     
-    # Téléchargement de fichiers
-    uploaded_files = st.file_uploader("Choisissez des fichiers", accept_multiple_files=True)
-    if uploaded_files:
-        for file in uploaded_files:
-            file_path = os.path.join(storage_directory, file.name)
-            # Sauvegarde du fichier téléchargé
-            with open(file_path, "wb") as f:
-                f.write(file.getbuffer())
-            st.success(f"Fichier '{file.name}' téléchargé et sauvegardé.")
+    st.session_state['section'] = "📂 Stockage et Organisation"
+    section = st.session_state['section']
     
-    # Affichage des fichiers téléchargés
-    st.subheader("Fichiers téléchargés")
-    files = os.listdir(storage_directory)
-    if files:
-        for file in files:
-            file_path = os.path.join(storage_directory, file)
-            col1, col2, col3 = st.columns([4, 1, 1])
-            with col1:
-                st.write(file)
-            with col2:
-                if st.button(f"Voir", key=f"view_{file}"):
-                    display_file(file_path)
-                    # Extraction et analyse de sentiment sur le contenu du fichier
-                    content = extract_content(file_path)
-                    if content:
-                        st.write(f"**Analyse de sentiment pour {file} :**")
-                        sentiment_result = analyze_sentiment(content)
-                        st.write(sentiment_result)
-            with col3:
-                if st.button(f"Supprimer", key=f"delete_{file}"):
-                    delete_file(file_path)
-                    st.experimental_rerun()
+    if section == "📂 Stockage et Organisation":
+        add_bg_image()
+        st.header("Stockage et Organisation des Connaissances")
+        st.write("Téléchargez et organisez vos documents ici.")
+        
+        # Téléchargement de fichiers
+        uploaded_files = st.file_uploader("Choisissez des fichiers", accept_multiple_files=True)
+        if uploaded_files:
+            for file in uploaded_files:
+                file_path = os.path.join(storage_directory, file.name)
+                # Sauvegarde du fichier téléchargé
+                with open(file_path, "wb") as f:
+                    f.write(file.getbuffer())
+                st.success(f"Fichier '{file.name}' téléchargé et sauvegardé.")
+        
+        # Affichage des fichiers téléchargés
+        st.subheader("Fichiers téléchargés")
+        files = os.listdir(storage_directory)
+        if files:
+            for file in files:
+                file_path = os.path.join(storage_directory, file)
+                col1, col2, col3 = st.columns([4, 1, 1])
+                with col1:
+                    st.write(file)
+                with col2:
+                    if st.button(f"Voir", key=f"view_{file}"):
+                        display_file(file_path)
+                with col3:
+                    if st.button(f"Supprimer", key=f"delete_{file}"):
+                        delete_file(file_path)
+                        st.experimental_rerun()
+                # Extraction et affichage du contenu
+                content = extract_content(file_path)
+                if content:
+                    st.write(f"**Contenu extrait de {file} :**")
+                    st.text_area(label="", value=content, height=300)
     
-    # Création de dossiers
-    folder_name = st.text_input("Créer un nouveau dossier")
-    if st.button("Créer Dossier"):
-        new_folder_path = os.path.join(storage_directory, folder_name)
-        if not os.path.exists(new_folder_path):
-            os.makedirs(new_folder_path)
-            st.success(f"Dossier '{folder_name}' créé.")
-        else:
-            st.warning(f"Le dossier '{folder_name}' existe déjà.")
+        # Création de dossiers
+        folder_name = st.text_input("Créer un nouveau dossier")
+        if st.button("Créer Dossier"):
+            new_folder_path = os.path.join(storage_directory, folder_name)
+            if not os.path.exists(new_folder_path):
+                os.makedirs(new_folder_path)
+                st.success(f"Dossier '{folder_name}' créé.")
+            else:
+                st.warning(f"Le dossier '{folder_name}' existe déjà.")
 
             
 # Fonctionnalité de recherche
