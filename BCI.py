@@ -15,9 +15,17 @@ def analyze_sentiment(text):
         model_name = "nlptown/bert-base-multilingual-uncased-sentiment"  # Exemple de modèle de sentiment
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         model = AutoModelForSequenceClassification.from_pretrained(model_name)
+        
+        # Troncature du texte pour ne pas dépasser la longueur maximale de séquence
+        max_length = 512
+        tokens = tokenizer(text, max_length=max_length, truncation=True, return_tensors='pt')
+        
         sentiment_analyzer = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer)
         
-        result = sentiment_analyzer(text)
+        # Convertir les tokens en texte pour le pipeline
+        truncated_text = tokenizer.decode(tokens['input_ids'][0], skip_special_tokens=True)
+        
+        result = sentiment_analyzer(truncated_text)
         return result
     
     except Exception as e:
