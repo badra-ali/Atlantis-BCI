@@ -14,15 +14,11 @@ def analyze_sentiment(text):
         model_name = "nlptown/bert-base-multilingual-uncased-sentiment"  # Exemple de modèle de sentiment
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         model = TFAutoModelForSequenceClassification.from_pretrained(model_name)  # Utilisation de TFAutoModelForSequenceClassification
+        sentiment_analyzer = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer, framework="tf")  # Spécification du framework TensorFlow
         
-        # Troncature du texte pour ne pas dépasser la longueur maximale de séquence
-        max_length = 512
-        inputs = tokenizer(text, max_length=max_length, truncation=True, return_tensors='tf')
-        
-        sentiment_analyzer = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer, framework="tf")
-        result = sentiment_analyzer(inputs) 
+        result = sentiment_analyzer(text)
         return result
-
+    
     except Exception as e:
         return str(e)  # Gérer les erreurs de chargement de modèle ici
 
