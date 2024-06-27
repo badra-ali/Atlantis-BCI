@@ -9,6 +9,11 @@ from transformers import pipeline
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Analyse de sentiment", layout="wide")
 
+def analyze_sentiment(text):
+        sentiment_analyzer = pipeline("sentiment-analysis")
+        result = sentiment_analyzer(text)
+        return result
+
 # Option de thème
 theme = st.sidebar.selectbox("Choisissez le thème", ["Clair", "Sombre"])
 
@@ -175,7 +180,9 @@ if section == "📂 Stockage et Organisation":
                 if content:
                     st.write(f"**Contenu extrait de {file} :**")
                     st.text_area(label="", value=content, height=300)
-    
+                    sentiment_result = analyze_sentiment(content)
+                    st.write(sentiment_result)
+                    
         # Création de dossiers
         folder_name = st.text_input("Créer un nouveau dossier")
         if st.button("Créer Dossier"):
