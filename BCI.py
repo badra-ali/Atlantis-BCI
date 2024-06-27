@@ -4,7 +4,7 @@ from streamlit_tags import st_tags  # For tag functionality
 from PIL import Image
 import PyPDF2
 import textract
-from transformers import TFAutoModelForSequenceClassification, AutoTokenizer 
+from transformers import AutoModelForSequenceClassification, AutoTokenizer 
 
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Analyse de sentiment", layout="wide")
