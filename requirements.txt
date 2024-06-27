@@ -3,3 +3,4 @@ streamlit_tags
 PyPDF2
 textract
 Pillow
+transformers
