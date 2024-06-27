@@ -1,2 +1,5 @@
 streamlit
 streamlit_tags
+PIL
+PyPDF2
+textract
