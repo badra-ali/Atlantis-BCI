@@ -6,8 +6,8 @@ import PyPDF2
 import textract
 from transformers import pipeline
 
-# Configuration de la page
-st.set_page_config(page_title="AtlantisBCI", layout="wide")
+# Configuration de la page Streamlit
+st.set_page_config(page_title="Analyse de sentiment", layout="wide")
 
 # Option de thème
 theme = st.sidebar.selectbox("Choisissez le thème", ["Clair", "Sombre"])
