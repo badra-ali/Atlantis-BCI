@@ -207,7 +207,7 @@ if section == "📂 Stockage et Organisation":
                 st.warning(f"Le dossier '{folder_name}' existe déjà.")
 
     # Stocker le chemin du répertoire de stockage dans st.session_state
-    storage_directory = "uploaded_files"
+    storage_directory = uploaded_files
     if not os.path.exists(storage_directory):
         os.makedirs(storage_directory)
     st.session_state['storage_directory'] = storage_directory
