@@ -105,7 +105,7 @@ if section == "📂 Stockage et Organisation":
             content = f"[Image: {file_path}]"
         elif file_extension == "pdf":
             with open(file_path, "rb") as file:
-                reader = PyPDF2.PdfFileReader(file)
+                reader = PyPDF2.PdfReader(file)
                 for page_num in range(reader.getNumPages()):
                     page = reader.getPage(page_num)
                     content += page.extract_text()
