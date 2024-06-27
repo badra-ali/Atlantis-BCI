@@ -1,5 +1,5 @@
 pip == 24.1.1
-torch
+tensorflow
 streamlit
 streamlit_tags
 PyPDF2
