@@ -25,7 +25,7 @@ def analyze_sentiment(text):
     
     except Exception as e:
         return str(e)  # Gérer les erreurs de chargement de modèle ici
-
+        
 # Option de thème
 theme = st.sidebar.selectbox("Choisissez le thème", ["Clair", "Sombre"])
 
