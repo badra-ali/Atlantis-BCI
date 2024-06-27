@@ -107,7 +107,7 @@ if section == "📂 Stockage et Organisation":
             with open(file_path, "rb") as file:
                 reader = PyPDF2.PdfReader(file)
                 for page_num in range(len(reader.pages)):
-                    page = reader.pages(page_num)
+                    page = reader.pages[page_num]
                     content += page.extract_text()
         else:
             content = textract.process(file_path).decode('utf-8')
