@@ -97,7 +97,7 @@ def add_bg_image():
         """
         <style>
         .stApp {
-            background-image: url('https://www.lecese.fr/sites/default/files/articles/IA%20ENvironnement-8.png');
+            background-image: url('https://media.ouest-france.fr/v1/pictures/213a4d74915df64de4e33e05f189a75b-utiliser-l-ia-pour-optimiser-sa-recherche-d-emploi.png');
             background-size: cover;
             background-position: center;
             }
