@@ -97,7 +97,7 @@ def add_bg_image():
         """
         <style>
         .stApp {
-            background-image: url('https://incubator.ucf.edu/wp-content/uploads/2023/07/artificial-intelligence-new-technology-science-futuristic-abstract-human-brain-ai-technology-cpu-central-processor-unit-chipset-big-data-machine-learning-cyber-mind-domination-generative-ai-scaled-1.jpg');
+            background-image: url('https://www.lecese.fr/sites/default/files/articles/IA%20ENvironnement-8.png');
             background-size: cover;
             background-position: center;
             }
