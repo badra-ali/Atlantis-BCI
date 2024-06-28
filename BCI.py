@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 from streamlit_tags import st_tags
+from PIL import Image
 import PyPDF2
 import textract
 from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM
@@ -13,23 +14,17 @@ storage_directory = "uploaded_files"
 if not os.path.exists(storage_directory):
     os.makedirs(storage_directory)
 
-@st.cache_data
-def load_model():
-    model_name = "facebook/bart-large-cnn"
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
-    summarizer = pipeline("summarization", model=model, tokenizer=tokenizer)
-    return summarizer, tokenizer
-
 def split_text_into_chunks(text, tokenizer, max_chunk_size):
     tokens = tokenizer(text, return_tensors='pt', truncation=False)['input_ids'][0]
     chunks = [tokens[i:i + max_chunk_size] for i in range(0, len(tokens), max_chunk_size)]
     return chunks
 
-@st.cache_data
 def summarize_text(text):
     try:
-        summarizer, tokenizer = load_model()
+        model_name = "facebook/bart-large-cnn"
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+        summarizer = pipeline("summarization", model=model, tokenizer=tokenizer)
 
         max_chunk_size = 512
         chunks = split_text_into_chunks(text, tokenizer, max_chunk_size)
