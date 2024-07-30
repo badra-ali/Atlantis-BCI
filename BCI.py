@@ -11,7 +11,7 @@ from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Analyse de sentiment", layout="wide")
 
-
+API_TOKEN=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
 # Initialisation du répertoire de stockage
 storage_directory = "uploaded_files"
 if not os.path.exists(storage_directory):
@@ -194,7 +194,7 @@ elif section == "🔍 Recherche":
             st.write("Résultat Web 2")
         elif search_type == "Bibliothèque":
             st.write(f"Recherche dans la Bibliothèque pour '{search_query}' :")
-
+            
             model_name = "deepset/roberta-base-squad2"
             nlp = pipeline("question-answering", model=model_name, tokenizer=model_name, use_auth_token=API_TOKEN)
 
