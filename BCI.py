@@ -11,7 +11,7 @@ from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Analyse de sentiment", layout="wide")
 
-API_TOKEN=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
+API_TOKEN= "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"
 # Initialisation du répertoire de stockage
 storage_directory = "uploaded_files"
 if not os.path.exists(storage_directory):
