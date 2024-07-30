@@ -14,6 +14,9 @@ storage_directory = "uploaded_files"
 if not os.path.exists(storage_directory):
     os.makedirs(storage_directory)
 
+# Jeton d'API Hugging Face
+API_TOKEN = 'votre_jeton_d_api'
+
 def split_text_into_chunks(text, tokenizer, max_chunk_size):
     tokens = tokenizer(text, return_tensors='pt', truncation=False)['input_ids'][0]
     chunks = [tokens[i:i + max_chunk_size] for i in range(0, len(tokens), max_chunk_size)]
@@ -22,9 +25,9 @@ def split_text_into_chunks(text, tokenizer, max_chunk_size):
 def summarize_text(text):
     try:
         model_name = "facebook/bart-large-cnn"
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
-        summarizer = pipeline("summarization", model=model, tokenizer=tokenizer)
+        tokenizer = AutoTokenizer.from_pretrained(model_name, use_auth_token=API_TOKEN)
+        model = AutoModelForSeq2SeqLM.from_pretrained(model_name, use_auth_token=API_TOKEN)
+        summarizer = pipeline("summarization", model=model, tokenizer=tokenizer, use_auth_token=API_TOKEN)
 
         max_chunk_size = 512
         chunks = split_text_into_chunks(text, tokenizer, max_chunk_size)
@@ -215,7 +218,7 @@ elif section == "🔍 Recherche":
             st.write(f"Recherche dans la Bibliothèque pour '{search_query}' :")
 
             model_name = "deepset/roberta-base-squad2"
-            nlp = pipeline("question-answering", model=model_name, tokenizer=model_name)
+            nlp = pipeline("question-answering", model=model_name, tokenizer=model_name, use_auth_token=API_TOKEN)
 
             library_contents = []
             for file in os.listdir(storage_directory):
@@ -241,7 +244,32 @@ elif section == "🤝 Collaboration":
         label="Partagez avec",
         text="Appuyez sur entrée pour ajouter un email",
         value=[],
-        suggestions=["user1@example.com", "user2@example.com"]
+        suggestions=["email1@example.com", "email2@example.com", "email3@example.com"],
+        maxtags=5
     )
+
+    selected_file = st.selectbox("Choisissez un fichier à partager", os.listdir(storage_directory))
     if st.button("Partager"):
-        st.write(f"Documents partagés avec : {', '.join(share_with)}")
+        st.success(f"Fichier '{selected_file}' partagé avec {', '.join(share_with)}.")
+
+elif section == "🔒 Sécurité":
+    add_bg_image()
+    st.header("Sécurité et Confidentialité")
+    st.write("Gérez les paramètres de sécurité et de confidentialité de vos documents.")
+
+    password = st.text_input("Définir un mot de passe", type="password")
+    if st.button("Sauvegarder le mot de passe"):
+        st.success("Mot de passe sauvegardé.")
+
+elif section == "🔗 Intégration":
+    add_bg_image()
+    st.header("Intégration avec d'autres Outils")
+    st.write("Intégrez d'autres outils et services à votre application.")
+
+elif section == "👤 Profil Utilisateur":
+    add_bg_image()
+    st.header("Profil Utilisateur")
+    st.write("Gérez votre profil utilisateur et vos paramètres.")
+    st.text_input("Nom complet")
+    st.text_input("Email")
+    st.text_area("Biographie")
