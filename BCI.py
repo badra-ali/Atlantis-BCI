@@ -11,7 +11,6 @@ from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Analyse de sentiment", layout="wide")
 
-os.environ["HUGGINGFACE_HUB_TOKEN"] = "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"
 
 # Initialisation du répertoire de stockage
 storage_directory = "uploaded_files"
@@ -23,32 +22,6 @@ def split_text_into_chunks(text, tokenizer, max_chunk_size):
     tokens = tokenizer(text, return_tensors='pt', truncation=False)['input_ids'][0]
     chunks = [tokens[i:i + max_chunk_size] for i in range(0, len(tokens), max_chunk_size)]
     return chunks
-
-# Configuration du pipeline avec un jeton d'API
-def setup_summarization_pipeline():
-    model_name = "facebook/bart-large-cnn"
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
-    
-    summarizer = pipeline("summarization", model=model, tokenizer=tokenizer)
-    return summarizer
-
-# Fonction de résumé de texte avec gestion des jetons
-def summarize_text(text):
-    summarizer = setup_summarization_pipeline()
-    max_chunk_size = 512
-    tokens = tokenizer(text, return_tensors='pt', truncation=False)['input_ids'][0]
-    chunks = [tokens[i:i + max_chunk_size] for i in range(0, len(tokens), max_chunk_size)]
-    
-    summaries = []
-    for chunk in chunks:
-        chunk_text = tokenizer.decode(chunk, skip_special_tokens=True)
-        summary = summarizer(chunk_text, max_length=150, min_length=30, do_sample=False)
-        summaries.append(summary[0]['summary_text'])
-    
-    combined_summary = ' '.join(summaries)
-    return combined_summary
-
 
 # Option de thème
 theme = st.sidebar.selectbox("Choisissez le thème", ["Clair", "Sombre"])
@@ -196,8 +169,7 @@ if section == "📂 Stockage et Organisation":
             if content:
                 st.write(f"**Contenu extrait de {file} :**")
                 st.text_area(label="", value=content, height=300)
-                sentiment_result = summarize_text(content)
-                st.write(sentiment_result)
+                
 
     folder_name = st.text_input("Créer un nouveau dossier")
     if st.button("Créer Dossier"):
