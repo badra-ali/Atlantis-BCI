@@ -14,35 +14,48 @@ storage_directory = "uploaded_files"
 if not os.path.exists(storage_directory):
     os.makedirs(storage_directory)
 
+# Fonction pour obtenir un jeton d'API
+def get_api_token():
+    # Cette fonction simule l'obtention d'un jeton d'API
+    # En pratique, cela peut impliquer une requête réseau pour obtenir un jeton valide
+    return "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"
+
 # Jeton d'API Hugging Face
-API_TOKEN = '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'
+API_TOKEN =get_api_token()
 
 def split_text_into_chunks(text, tokenizer, max_chunk_size):
     tokens = tokenizer(text, return_tensors='pt', truncation=False)['input_ids'][0]
     chunks = [tokens[i:i + max_chunk_size] for i in range(0, len(tokens), max_chunk_size)]
     return chunks
 
+
+# Configuration du pipeline avec un jeton d'API
+def setup_summarization_pipeline():
+    api_token = get_api_token()
+    headers = {"Authorization": f"Bearer {api_token}"}
+    
+    model_name = "facebook/bart-large-cnn"
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForSeq2SeqLM.from_pretrained(model_name, use_auth_token=api_token)
+    
+    summarizer = pipeline("summarization", model=model, tokenizer=tokenizer, headers=headers)
+    return summarizer
+
+# Fonction de résumé de texte avec gestion des jetons
 def summarize_text(text):
-    try:
-        model_name = "facebook/bart-large-cnn"
-        tokenizer = AutoTokenizer.from_pretrained(model_name, use_auth_token=API_TOKEN)
-        model = AutoModelForSeq2SeqLM.from_pretrained(model_name, use_auth_token=API_TOKEN)
-        summarizer = pipeline("summarization", model=model, tokenizer=tokenizer, use_auth_token=API_TOKEN)
-
-        max_chunk_size = 512
-        chunks = split_text_into_chunks(text, tokenizer, max_chunk_size)
-
-        summaries = []
-        for chunk in chunks:
-            chunk_text = tokenizer.decode(chunk, skip_special_tokens=True)
-            summary = summarizer(chunk_text, max_length=150, min_length=30, do_sample=False)
-            summaries.append(summary[0]['summary_text'])
-
-        combined_summary = ' '.join(summaries)
-        return combined_summary
-
-    except Exception as e:
-        return str(e)
+    summarizer = setup_summarization_pipeline()
+    max_chunk_size = 512
+    tokens = tokenizer(text, return_tensors='pt', truncation=False)['input_ids'][0]
+    chunks = [tokens[i:i + max_chunk_size] for i in range(0, len(tokens), max_chunk_size)]
+    
+    summaries = []
+    for chunk in chunks:
+        chunk_text = tokenizer.decode(chunk, skip_special_tokens=True)
+        summary = summarizer(chunk_text, max_length=150, min_length=30, do_sample=False)
+        summaries.append(summary[0]['summary_text'])
+    
+    combined_summary = ' '.join(summaries)
+    return combined_summary
 
 # Option de thème
 theme = st.sidebar.selectbox("Choisissez le thème", ["Clair", "Sombre"])
