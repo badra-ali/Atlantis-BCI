@@ -6,8 +6,11 @@ import PyPDF2
 import textract
 from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM
 
+
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Analyse de sentiment", layout="wide")
+
+os.environ["HUGGINGFACE_HUB_TOKEN"] = "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"
 
 # Initialisation du répertoire de stockage
 storage_directory = "uploaded_files"
@@ -29,16 +32,16 @@ def split_text_into_chunks(text, tokenizer, max_chunk_size):
     return chunks
 
 
+import requests
+from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM
+
 # Configuration du pipeline avec un jeton d'API
 def setup_summarization_pipeline():
-    api_token = get_api_token()
-    headers = {"Authorization": f"Bearer {api_token}"}
-    
     model_name = "facebook/bart-large-cnn"
     tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForSeq2SeqLM.from_pretrained(model_name, use_auth_token=api_token)
+    model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
     
-    summarizer = pipeline("summarization", model=model, tokenizer=tokenizer, headers=headers)
+    summarizer = pipeline("summarization", model=model, tokenizer=tokenizer)
     return summarizer
 
 # Fonction de résumé de texte avec gestion des jetons
@@ -56,6 +59,7 @@ def summarize_text(text):
     
     combined_summary = ' '.join(summaries)
     return combined_summary
+
 
 # Option de thème
 theme = st.sidebar.selectbox("Choisissez le thème", ["Clair", "Sombre"])
