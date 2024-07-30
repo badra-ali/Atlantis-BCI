@@ -15,7 +15,7 @@ if not os.path.exists(storage_directory):
     os.makedirs(storage_directory)
 
 # Jeton d'API Hugging Face
-API_TOKEN = 'votre_jeton_d_api'
+API_TOKEN = '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'
 
 def split_text_into_chunks(text, tokenizer, max_chunk_size):
     tokens = tokenizer(text, return_tensors='pt', truncation=False)['input_ids'][0]
